@@ -94,8 +94,15 @@ class HaveCakeProblem(Problem):
 
     @lru_cache(maxsize=8192)
     def h_ignore_preconditions(self, node: Node):
-        # not implemented
         count = 0
+        state = decode_state(node.state, self.state_map)
+        for goal in self.goal:
+            if goal in state.pos:
+                continue
+            for action in self.actions_list:
+                if goal in action.effect_add:
+                    count += 1
+                    break
         return count
 
 
@@ -139,7 +146,7 @@ if __name__ == '__main__':
     run_search(p, greedy_best_first_graph_search, parameter=p.h_1)
     print("*** A-star null heuristic")
     run_search(p, astar_search, p.h_1)
-    # print("A-star ignore preconditions heuristic")
-    # rs(p, "astar_search - ignore preconditions heuristic", astar_search, p.h_ignore_preconditions)
-    # print(""A-star levelsum heuristic)
-    # rs(p, "astar_search - levelsum heuristic", astar_search, p.h_pg_levelsum)
+    print("A-star ignore preconditions heuristic")
+    run_search(p, astar_search, p.h_ignore_preconditions)
+    print("A-star levelsum heuristic")
+    run_search(p, astar_search, p.h_pg_levelsum)
